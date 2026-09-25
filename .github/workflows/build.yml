@@ -42,12 +42,25 @@ jobs:
           provenance: mode=max
           sbom: true
           tags: |
-            ghcr.io/innobraingmbh/actions-runner-php:8.4
-            ghcr.io/innobraingmbh/actions-runner-php:8.4-${{ github.run_number }}
+            ghcr.io/innobraingmbh/actions-runner-php:latest
+            ghcr.io/innobraingmbh/actions-runner-php:${{ github.run_number }}
+
+      - name: Smoke test
+        env:
+          IMAGE: ghcr.io/innobraingmbh/actions-runner-php@${{ steps.build.outputs.digest }}
+        run: |
+          docker run --rm "$IMAGE" bash -euc '
+            php -v | grep "^PHP 8.4"
+            php8.5 -v | grep "^PHP 8.5"
+            php-config8.4 --version && php-config8.5 --version
+            node -v | grep "^v22"
+            composer --version
+            test -f "$RUNNER_TOOL_CACHE/node/$(node -v | tr -d v)/arm64.complete"
+          '
 
       # Signed statement that this workflow, from this commit, built the digest
       # the tag points at. Verify with
-      # gh attestation verify oci://ghcr.io/innobraingmbh/actions-runner-php:8.4 --owner innobraingmbh
+      # gh attestation verify oci://ghcr.io/innobraingmbh/actions-runner-php:latest --owner innobraingmbh
       - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-name: ghcr.io/innobraingmbh/actions-runner-php

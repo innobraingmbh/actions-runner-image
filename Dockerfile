@@ -8,29 +8,20 @@ ARG NODE_SHA256=fff4078c5def658577f92c88db7db3bc0072924bfb93fe52c1e744a54e94abb8
 
 USER root
 
-# setup-php only treats PHP as installed when php-config (php8.4-dev) exists;
-# the rest of the list is what it would install itself.
+# setup-php treats a version as installed once php<ver> and php-config<ver>
+# (the -dev package) exist, and then only switches the alternatives to it.
+# php stays 8.4 until a job asks for 8.5.
 RUN apt-get update \
     && apt-get upgrade -y --no-install-recommends \
     && apt-get install -y --no-install-recommends ca-certificates curl gnupg software-properties-common unzip xz-utils \
     && add-apt-repository -y ppa:ondrej/php \
     && apt-get install -y --no-install-recommends \
-        php8.4-bcmath \
-        php8.4-cgi \
-        php8.4-cli \
-        php8.4-curl \
-        php8.4-dev \
-        php8.4-fpm \
-        php8.4-gd \
-        php8.4-intl \
-        php8.4-mbstring \
-        php8.4-mysql \
-        php8.4-opcache \
-        php8.4-pgsql \
-        php8.4-readline \
-        php8.4-sqlite3 \
-        php8.4-xml \
-        php8.4-zip \
+        $(for version in 8.4 8.5; do \
+            for extension in bcmath cli curl dev gd intl mbstring mysql opcache pgsql readline sqlite3 xml zip; do \
+                printf 'php%s-%s ' "$version" "$extension"; \
+            done; \
+        done) \
+    && for tool in php phar phar.phar php-config phpize; do update-alternatives --set "$tool" "/usr/bin/${tool}8.4"; done \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
