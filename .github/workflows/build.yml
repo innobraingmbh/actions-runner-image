@@ -56,6 +56,7 @@ jobs:
             node -v | grep "^v22"
             composer --version
             test -f "$RUNNER_TOOL_CACHE/node/$(node -v | tr -d v)/arm64.complete"
+            test -f "/__t/node/$(node -v | tr -d v)/arm64.complete"
           '
 
       # Signed statement that this workflow, from this commit, built the digest

@@ -3,7 +3,9 @@
 The runner image for the self-hosted `asahi-arm64` runners (ARC on the rack
 MacBooks): `ghcr.io/actions/actions-runner` plus PHP 8.4 and 8.5, Composer
 and Node 22, so jobs skip the per-job toolchain install. `php` is 8.4 until
-a job's `setup-php` asks for 8.5, which switches the alternatives.
+a job's `setup-php` asks for 8.5, which switches the alternatives. The Node
+tool cache lives in `/opt/hostedtoolcache`, with `/__t` (where the runner
+points the actions inside a job container) leading to it.
 
 Built weekly and on push by the Build workflow, published as
 `ghcr.io/innobraingmbh/actions-runner-php:latest` (and as the run number,

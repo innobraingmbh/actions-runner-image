@@ -28,7 +28,9 @@ RUN apt-get update \
 
 # setup-node ignores PATH and looks in the runner tool cache, which by default
 # sits on the job's empty work volume. A tool cache outside it, in the layout
-# @actions/tool-cache expects, makes setup-node a no-op.
+# @actions/tool-cache expects, makes setup-node a no-op. Inside a job container
+# the runner tells the actions the cache is at /__t, which the kubernetes hook
+# never mounts, so that path leads to the same cache.
 ENV RUNNER_TOOL_CACHE=/opt/hostedtoolcache
 RUN mkdir -p "$RUNNER_TOOL_CACHE/node/$NODE_VERSION/arm64" \
     && curl -fsSLo /tmp/node.tar.xz "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-arm64.tar.xz" \
@@ -37,7 +39,8 @@ RUN mkdir -p "$RUNNER_TOOL_CACHE/node/$NODE_VERSION/arm64" \
     && rm /tmp/node.tar.xz \
     && touch "$RUNNER_TOOL_CACHE/node/$NODE_VERSION/arm64.complete" \
     && ln -s "$RUNNER_TOOL_CACHE/node/$NODE_VERSION/arm64/bin/"* /usr/local/bin/ \
-    && chown -R runner:runner "$RUNNER_TOOL_CACHE"
+    && chown -R runner:runner "$RUNNER_TOOL_CACHE" \
+    && ln -s "$RUNNER_TOOL_CACHE" /__t
 
 COPY --from=composer:2.9.8@sha256:b09bccd91a78fe8a9ab4b33d707b862e8fe54fec17782e32683ad2a69c46867d /usr/bin/composer /usr/local/bin/composer
 
