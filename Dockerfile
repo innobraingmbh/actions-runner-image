@@ -10,17 +10,18 @@ USER root
 
 # setup-php treats a version as installed once php<ver> and php-config<ver>
 # (the -dev package) exist, and then only switches the alternatives to it.
-# php stays 8.4 until a job asks for 8.5.
+# php stays 8.4 until a job asks for 8.5. OPcache is part of the engine from
+# 8.5 on, so only 8.4 has the package.
 RUN apt-get update \
     && apt-get upgrade -y --no-install-recommends \
     && apt-get install -y --no-install-recommends ca-certificates curl gnupg software-properties-common unzip xz-utils \
     && add-apt-repository -y ppa:ondrej/php \
     && apt-get install -y --no-install-recommends \
         $(for version in 8.4 8.5; do \
-            for extension in bcmath cli curl dev gd intl mbstring mysql opcache pgsql readline sqlite3 xml zip; do \
+            for extension in bcmath cli curl dev gd intl mbstring mysql pgsql readline sqlite3 xml zip; do \
                 printf 'php%s-%s ' "$version" "$extension"; \
             done; \
-        done) \
+        done) php8.4-opcache \
     && for tool in php phar phar.phar php-config phpize; do update-alternatives --set "$tool" "/usr/bin/${tool}8.4"; done \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
