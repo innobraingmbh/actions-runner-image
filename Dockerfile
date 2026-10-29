@@ -1,7 +1,7 @@
 # Runner image for the rack cluster (ARC, arm64): the stock runner plus the
 # PHP toolchain, so jobs skip the apt install setup-php would otherwise do.
 # Base images are pinned by digest; Dependabot proposes the bumps.
-FROM ghcr.io/actions/actions-runner:2.337.0@sha256:e5496277be5d09bc968b3d64911b74e219ac4a3f2edce956a3ecf9271bea1ef4
+FROM ghcr.io/actions/actions-runner:2.338.2@sha256:759a1d94a15b05941aba5196974ff43fe15b4cbba29b694b35cbc32a1166b232
 
 ARG NODE_VERSION=22.23.2
 ARG NODE_SHA256=fff4078c5def658577f92c88db7db3bc0072924bfb93fe52c1e744a54e94abb8
